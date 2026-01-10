@@ -1,0 +1,149 @@
+/*
+ * ============================================
+ * GLOBALS.CSS - Main stylesheet for the app
+ * ============================================
+ *
+ * This file sets up:
+ * 1. Tailwind CSS imports
+ * 2. CSS custom properties (variables) for theming
+ * 3. Dark mode color scheme
+ *
+ * CSS Variables (Custom Properties):
+ * - Variables start with -- (e.g., --background)
+ * - They let you define values once and reuse them everywhere
+ * - Great for theming because you can change colors in one place
+ */
+
+@import "tailwindcss";
+
+/*
+ * :root is the highest-level element (the <html> tag)
+ * Variables defined here are available throughout the entire document
+ *
+ * We're using HSL colors (Hue, Saturation, Lightness):
+ * - Hue: 0-360 (color wheel position)
+ * - Saturation: 0-100% (how vivid the color is)
+ * - Lightness: 0-100% (how light/dark)
+ *
+ * This makes it easy to create consistent color variations
+ */
+:root {
+  /* Base colors - these are dark mode defaults (modern gray theme) */
+  --background: 224 71% 4%;        /* Very dark blue-gray - main background */
+  --foreground: 213 31% 91%;       /* Light gray - main text color */
+
+  /* Card/surface colors - slightly lighter than background for layering */
+  --card: 224 71% 4%;
+  --card-foreground: 213 31% 91%;
+
+  /* Popover colors - for dropdowns, tooltips, etc. */
+  --popover: 224 71% 4%;
+  --popover-foreground: 213 31% 91%;
+
+  /* Primary colors - your main brand/accent color */
+  --primary: 210 40% 98%;          /* Almost white */
+  --primary-foreground: 222 47% 11%; /* Dark blue-gray */
+
+  /* Secondary colors - for less prominent elements */
+  --secondary: 222 47% 11%;
+  --secondary-foreground: 210 40% 98%;
+
+  /* Muted colors - for subtle backgrounds and disabled states */
+  --muted: 223 47% 11%;
+  --muted-foreground: 215 16% 47%;
+
+  /* Accent colors - for highlights and hover states */
+  --accent: 216 34% 17%;
+  --accent-foreground: 210 40% 98%;
+
+  /* Semantic colors - colors that convey meaning */
+  --destructive: 0 63% 31%;        /* Red for errors/delete actions */
+  --destructive-foreground: 210 40% 98%;
+
+  /* Border and input colors */
+  --border: 216 34% 17%;
+  --input: 216 34% 17%;
+
+  /* Ring color - for focus states (accessibility!) */
+  --ring: 216 34% 17%;
+
+  /* Border radius - controls how rounded corners are */
+  --radius: 0.5rem;
+}
+
+/*
+ * @theme inline tells Tailwind to use these CSS variables
+ * This creates utility classes like bg-background, text-foreground, etc.
+ */
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius));
+  --radius-lg: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 8px);
+  /*
+   * System font stacks for reliable rendering
+   * These use fonts already installed on users' devices
+   */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/*
+ * Base styles applied to all elements
+ * The * selector means "everything"
+ */
+* {
+  border-color: hsl(var(--border));
+}
+
+/*
+ * Body styles
+ * - Sets the default background and text colors
+ * - Uses the CSS variables we defined above
+ */
+body {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/*
+ * Custom scrollbar styling for webkit browsers (Chrome, Safari, Edge)
+ * This gives us a sleek dark scrollbar that matches our theme
+ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
