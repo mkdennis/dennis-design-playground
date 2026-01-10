@@ -18,3 +18,4 @@
 export { ComponentList } from "./ComponentList";
 export { ComponentViewer } from "./ComponentViewer";
 export { SettingsPanel } from "./SettingsPanel";
+export { VariantGallery } from "./VariantGallery";

@@ -23,16 +23,21 @@
 
 import { ComponentDefinition } from "@/registry/types";
 import { cn } from "@/lib/utils";
+import { VariantGallery } from "./VariantGallery";
 
 /**
  * ComponentViewerProps - Props interface
  *
  * @param component - The selected component definition (or null)
  * @param currentProps - The current values of all configurable props
+ * @param selectedVariantId - The currently selected variant ID
+ * @param onSelectVariant - Callback when a variant is selected
  */
 interface ComponentViewerProps {
   component: ComponentDefinition | null;
   currentProps: Record<string, unknown>;
+  selectedVariantId?: string;
+  onSelectVariant?: (variantId: string) => void;
 }
 
 /**
@@ -41,8 +46,22 @@ interface ComponentViewerProps {
  * This component handles two states:
  * 1. No component selected: Shows an empty state prompt
  * 2. Component selected: Renders the component in a preview area
+ *
+ * Now includes variant gallery support for switching between different designs
  */
-export function ComponentViewer({ component, currentProps }: ComponentViewerProps) {
+export function ComponentViewer({
+  component,
+  currentProps,
+  selectedVariantId,
+  onSelectVariant,
+}: ComponentViewerProps) {
+  // Get the selected variant or use the default render function
+  const selectedVariant = component?.variants?.find(
+    (v) => v.id === selectedVariantId
+  );
+
+  // Use variant render if available, otherwise use component render
+  const renderFunction = selectedVariant?.render || component?.render;
   return (
     /*
      * Main container:
@@ -126,7 +145,7 @@ export function ComponentViewer({ component, currentProps }: ComponentViewerProp
              * This is where the component preview is actually rendered!
              */}
             <div className="p-8">
-              {component.render(currentProps)}
+              {renderFunction && renderFunction(currentProps)}
             </div>
           </div>
         ) : (
@@ -170,6 +189,18 @@ export function ComponentViewer({ component, currentProps }: ComponentViewerProp
           </div>
         )}
       </div>
+
+      {/*
+       * Variant Gallery - shown below the preview when variants are available
+       */}
+      {component && component.variants && component.variants.length > 0 && (
+        <VariantGallery
+          variants={component.variants}
+          selectedVariantId={selectedVariantId || component.variants[0].id}
+          onSelectVariant={onSelectVariant || (() => {})}
+          currentProps={currentProps}
+        />
+      )}
     </div>
   );
 }

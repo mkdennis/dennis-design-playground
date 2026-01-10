@@ -92,6 +92,46 @@ export interface PropDefinition {
 }
 
 /**
+ * ButtonVariant - A specific variant/design of a button
+ *
+ * Each variant represents a different button design imported from various sources.
+ * Variants can have different visual styles while maintaining the same props structure.
+ */
+export interface ButtonVariant {
+  /**
+   * Unique identifier for this variant
+   * @example "default", "glassmorphism", "neubrutalism"
+   */
+  id: string;
+
+  /**
+   * Display name for the variant
+   * @example "Default", "Glassmorphism", "Neubrutalism"
+   */
+  name: string;
+
+  /**
+   * Brief description of the variant style
+   */
+  description: string;
+
+  /**
+   * Render function for this variant
+   */
+  render: (props: Record<string, unknown>) => ReactNode;
+
+  /**
+   * Code generation for this variant
+   */
+  code: (props: Record<string, unknown>) => string;
+
+  /**
+   * Optional preview image URL or thumbnail
+   */
+  thumbnail?: string;
+}
+
+/**
  * ComponentDefinition - The complete definition of a library component
  *
  * This is the main type that describes everything about a component
@@ -127,16 +167,22 @@ export interface ComponentDefinition {
    * The configurable props for this component
    *
    * This is a Record (object/dictionary) where:
-   * - Keys are prop names (e.g., "variant", "disabled")
+   * - Keys are prop names (e.g., "state", "disabled")
    * - Values are PropDefinition objects
    *
    * @example
    * props: {
-   *   variant: { type: "select", label: "Variant", options: [...] },
+   *   state: { type: "select", label: "State", options: [...] },
    *   disabled: { type: "boolean", label: "Disabled", defaultValue: false }
    * }
    */
   props: Record<string, PropDefinition>;
+
+  /**
+   * Optional variants for components that support multiple designs
+   * Currently used for buttons to switch between different design styles
+   */
+  variants?: ButtonVariant[];
 
   /**
    * The function that renders the component
@@ -148,7 +194,7 @@ export interface ComponentDefinition {
    * @returns The rendered React component
    *
    * @example
-   * render: (props) => <Button variant={props.variant}>{props.children}</Button>
+   * render: (props) => <Button state={props.state}>{props.children}</Button>
    */
   render: (props: Record<string, unknown>) => ReactNode;
 
@@ -162,7 +208,7 @@ export interface ComponentDefinition {
    * @returns A string of JSX code
    *
    * @example
-   * code: (props) => `<Button variant="${props.variant}">${props.children}</Button>`
+   * code: (props) => `<Button state="${props.state}">${props.children}</Button>`
    */
   code: (props: Record<string, unknown>) => string;
 }

@@ -42,11 +42,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
  * @param component - The selected component (or null)
  * @param currentProps - Current values of all props
  * @param onPropsChange - Callback when a prop value changes
+ * @param selectedVariantId - The currently selected variant ID (if any)
  */
 interface SettingsPanelProps {
   component: ComponentDefinition | null;
   currentProps: Record<string, unknown>;
   onPropsChange: (props: Record<string, unknown>) => void;
+  selectedVariantId?: string;
 }
 
 /**
@@ -56,6 +58,7 @@ export function SettingsPanel({
   component,
   currentProps,
   onPropsChange,
+  selectedVariantId,
 }: SettingsPanelProps) {
   /*
    * Local state for the "copied" feedback
@@ -98,9 +101,15 @@ export function SettingsPanel({
     if (!component) return;
 
     /*
-     * Generate the code string using the component's code function
+     * Generate the code string using the variant's code function if a variant is selected,
+     * otherwise use the component's default code function
      */
-    const code = component.code(currentProps);
+    const selectedVariant = component.variants?.find(
+      (v) => v.id === selectedVariantId
+    );
+    const code = selectedVariant
+      ? selectedVariant.code(currentProps)
+      : component.code(currentProps);
 
     try {
       /*
@@ -350,7 +359,16 @@ export function SettingsPanel({
                   "whitespace-pre-wrap break-words"
                 )}
               >
-                <code>{component.code(currentProps)}</code>
+                <code>
+                  {(() => {
+                    const selectedVariant = component.variants?.find(
+                      (v) => v.id === selectedVariantId
+                    );
+                    return selectedVariant
+                      ? selectedVariant.code(currentProps)
+                      : component.code(currentProps);
+                  })()}
+                </code>
               </pre>
             </div>
 

@@ -16,7 +16,15 @@
  */
 
 import { Button } from "@/components/ui/button";
-import { ComponentDefinition } from "../types";
+import {
+  GlassmorphismButton,
+  NeubrutalistButton,
+  GradientGlowButton,
+  SoftShadowButton,
+  MinimalUnderlineButton,
+  DepthButton,
+} from "@/components/ui/button-variants";
+import { ComponentDefinition, ButtonVariant } from "../types";
 
 /**
  * buttonComponent - Complete definition for the Button
@@ -64,13 +72,13 @@ export const buttonComponent: ComponentDefinition = {
     },
 
     /*
-     * variant - Visual style of the button
+     * state - Visual state of the button
      * Using "select" type renders a dropdown
      */
-    variant: {
+    state: {
       type: "select",
-      label: "Variant",
-      description: "The visual style of the button",
+      label: "State",
+      description: "The visual state of the button",
       defaultValue: "default",
       options: [
         { value: "default", label: "Default" },
@@ -120,7 +128,7 @@ export const buttonComponent: ComponentDefinition = {
    */
   render: (props) => (
     <Button
-      variant={props.variant as "default" | "secondary" | "destructive" | "outline" | "ghost" | "link"}
+      variant={props.state as "default" | "secondary" | "destructive" | "outline" | "ghost" | "link"}
       size={props.size as "default" | "sm" | "lg" | "icon"}
       disabled={props.disabled as boolean}
     >
@@ -144,8 +152,8 @@ export const buttonComponent: ComponentDefinition = {
      */
     const propsArray: string[] = [];
 
-    if (props.variant !== "default") {
-      propsArray.push(`variant="${props.variant}"`);
+    if (props.state !== "default") {
+      propsArray.push(`variant="${props.state}"`);
     }
     if (props.size !== "default") {
       propsArray.push(`size="${props.size}"`);
@@ -161,4 +169,135 @@ export const buttonComponent: ComponentDefinition = {
 
     return `<Button${propsString}>${props.children}</Button>`;
   },
+
+  /*
+   * variants - Different button designs
+   * These are alternative visual designs that users can switch between
+   */
+  variants: [
+    {
+      id: "default",
+      name: "Default",
+      description: "Standard shadcn/ui button with clean, minimal design",
+      render: (props) => (
+        <Button
+          variant={props.state as "default" | "secondary" | "destructive" | "outline" | "ghost" | "link"}
+          size={props.size as "default" | "sm" | "lg" | "icon"}
+          disabled={props.disabled as boolean}
+        >
+          {props.children as string}
+        </Button>
+      ),
+      code: (props) => {
+        const propsArray: string[] = [];
+        if (props.state !== "default") propsArray.push(`variant="${props.state}"`);
+        if (props.size !== "default") propsArray.push(`size="${props.size}"`);
+        if (props.disabled) propsArray.push("disabled");
+        const propsString = propsArray.length > 0 ? ` ${propsArray.join(" ")}` : "";
+        return `<Button${propsString}>${props.children}</Button>`;
+      },
+    },
+    {
+      id: "glassmorphism",
+      name: "Glassmorphism",
+      description: "Modern glass effect with backdrop blur and transparency",
+      render: (props) => (
+        <div className="bg-gradient-to-br from-purple-600 to-blue-500 p-8 rounded-xl">
+          <GlassmorphismButton
+            size={props.size as "default" | "sm" | "lg" | "icon"}
+            disabled={props.disabled as boolean}
+          >
+            {props.children as string}
+          </GlassmorphismButton>
+        </div>
+      ),
+      code: (props) => {
+        const propsArray: string[] = [];
+        if (props.size !== "default") propsArray.push(`size="${props.size}"`);
+        if (props.disabled) propsArray.push("disabled");
+        const propsString = propsArray.length > 0 ? ` ${propsArray.join(" ")}` : "";
+        return `<GlassmorphismButton${propsString}>${props.children}</GlassmorphismButton>`;
+      },
+    },
+    {
+      id: "neubrutalism",
+      name: "Neubrutalism",
+      description: "Bold design with thick borders and strong shadows",
+      render: (props) => (
+        <NeubrutalistButton
+          size={props.size as "default" | "sm" | "lg" | "icon"}
+          disabled={props.disabled as boolean}
+        >
+          {props.children as string}
+        </NeubrutalistButton>
+      ),
+      code: (props) => {
+        const propsArray: string[] = [];
+        if (props.size !== "default") propsArray.push(`size="${props.size}"`);
+        if (props.disabled) propsArray.push("disabled");
+        const propsString = propsArray.length > 0 ? ` ${propsArray.join(" ")}` : "";
+        return `<NeubrutalistButton${propsString}>${props.children}</NeubrutalistButton>`;
+      },
+    },
+    {
+      id: "gradient-glow",
+      name: "Gradient Glow",
+      description: "Vibrant gradient with glowing shadow effect",
+      render: (props) => (
+        <GradientGlowButton
+          size={props.size as "default" | "sm" | "lg" | "icon"}
+          disabled={props.disabled as boolean}
+        >
+          {props.children as string}
+        </GradientGlowButton>
+      ),
+      code: (props) => {
+        const propsArray: string[] = [];
+        if (props.size !== "default") propsArray.push(`size="${props.size}"`);
+        if (props.disabled) propsArray.push("disabled");
+        const propsString = propsArray.length > 0 ? ` ${propsArray.join(" ")}` : "";
+        return `<GradientGlowButton${propsString}>${props.children}</GradientGlowButton>`;
+      },
+    },
+    {
+      id: "soft-shadow",
+      name: "Soft Shadow",
+      description: "Minimalist neumorphism with soft shadows",
+      render: (props) => (
+        <SoftShadowButton
+          size={props.size as "default" | "sm" | "lg" | "icon"}
+          disabled={props.disabled as boolean}
+        >
+          {props.children as string}
+        </SoftShadowButton>
+      ),
+      code: (props) => {
+        const propsArray: string[] = [];
+        if (props.size !== "default") propsArray.push(`size="${props.size}"`);
+        if (props.disabled) propsArray.push("disabled");
+        const propsString = propsArray.length > 0 ? ` ${propsArray.join(" ")}` : "";
+        return `<SoftShadowButton${propsString}>${props.children}</SoftShadowButton>`;
+      },
+    },
+    {
+      id: "depth",
+      name: "3D Depth",
+      description: "Button with 3D depth and layered shadow effect",
+      render: (props) => (
+        <DepthButton
+          size={props.size as "default" | "sm" | "lg" | "icon"}
+          disabled={props.disabled as boolean}
+        >
+          {props.children as string}
+        </DepthButton>
+      ),
+      code: (props) => {
+        const propsArray: string[] = [];
+        if (props.size !== "default") propsArray.push(`size="${props.size}"`);
+        if (props.disabled) propsArray.push("disabled");
+        const propsString = propsArray.length > 0 ? ` ${propsArray.join(" ")}` : "";
+        return `<DepthButton${propsString}>${props.children}</DepthButton>`;
+      },
+    },
+  ] as ButtonVariant[],
 };

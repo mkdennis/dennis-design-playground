@@ -66,6 +66,12 @@ export default function Home() {
   const [currentProps, setCurrentProps] = useState<Record<string, unknown>>({});
 
   /**
+   * Selected variant ID for components that support variants
+   * Defaults to the first variant when a component is selected
+   */
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
+
+  /**
    * Mobile responsive state
    * - sidebarOpen: Controls left sidebar visibility on mobile
    * - settingsOpen: Controls right settings panel visibility on mobile
@@ -111,7 +117,8 @@ export default function Home() {
    * When a user clicks on a component in the list:
    * 1. Update the selected component ID
    * 2. Initialize the props with default values from the definition
-   * 3. Close mobile panels (better UX on small screens)
+   * 3. Set the default variant (first variant if available)
+   * 4. Close mobile panels (better UX on small screens)
    */
   const handleSelectComponent = useCallback((id: string) => {
     setSelectedComponentId(id);
@@ -124,8 +131,8 @@ export default function Home() {
       /*
        * Build initial props object from the component's prop definitions
        *
-       * Object.entries converts { variant: {...}, size: {...} }
-       * to [["variant", {...}], ["size", {...}]]
+       * Object.entries converts { state: {...}, size: {...} }
+       * to [["state", {...}], ["size", {...}]]
        *
        * reduce() builds a new object by iterating through the entries
        * acc is the "accumulator" - the object we're building
@@ -138,6 +145,15 @@ export default function Home() {
         {} as Record<string, unknown>
       );
       setCurrentProps(initialProps);
+
+      /*
+       * Set default variant to the first one if variants exist
+       */
+      if (component.variants && component.variants.length > 0) {
+        setSelectedVariantId(component.variants[0].id);
+      } else {
+        setSelectedVariantId(null);
+      }
     }
 
     /*
@@ -155,6 +171,15 @@ export default function Home() {
    */
   const handlePropsChange = useCallback((newProps: Record<string, unknown>) => {
     setCurrentProps(newProps);
+  }, []);
+
+  /**
+   * Handle variant selection from the gallery
+   *
+   * Updates the selected variant ID, which changes the preview
+   */
+  const handleSelectVariant = useCallback((variantId: string) => {
+    setSelectedVariantId(variantId);
   }, []);
 
   /*
@@ -322,6 +347,8 @@ export default function Home() {
           <ComponentViewer
             component={selectedComponent ?? null}
             currentProps={currentProps}
+            selectedVariantId={selectedVariantId ?? undefined}
+            onSelectVariant={handleSelectVariant}
           />
         </main>
 
@@ -354,6 +381,7 @@ export default function Home() {
             component={selectedComponent ?? null}
             currentProps={currentProps}
             onPropsChange={handlePropsChange}
+            selectedVariantId={selectedVariantId ?? undefined}
           />
         </aside>
 
