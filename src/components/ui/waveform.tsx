@@ -3,15 +3,21 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
+export type WaveformStyle = "line" | "bars";
+
 export interface WaveformProps {
+  /** Rendering style: continuous line or vertical bars */
+  style?: WaveformStyle;
   /** Amplitude multiplier (0.1-0.5) */
   amplitude?: number;
   /** FFT size for analysis (256-2048) */
   fftSize?: 256 | 512 | 1024 | 2048;
   /** Smoothing time constant (0-0.95) */
   smoothing?: number;
-  /** Line width in pixels */
+  /** Line width in pixels (or bar width for bars style) */
   lineWidth?: number;
+  /** Gap between bars (only for bars style) */
+  barGap?: number;
   /** Stroke color */
   strokeColor?: string;
   /** Show baseline */
@@ -23,10 +29,12 @@ export interface WaveformProps {
 }
 
 export function Waveform({
+  style = "line",
   amplitude = 0.18,
   fftSize = 1024,
   smoothing = 0.85,
   lineWidth = 1.5,
+  barGap = 2,
   strokeColor = "currentColor",
   showBaseline = true,
   height = 64,
@@ -94,28 +102,59 @@ export function Waveform({
       ctx.globalAlpha = 1;
     }
 
-    // Wave line
-    ctx.lineWidth = lineWidth;
-    ctx.beginPath();
-
-    const slice = w / (data.length - 1);
-    let x = 0;
-
     const amp = h * amplitude;
 
-    for (let i = 0; i < data.length; i++) {
-      const v = (data[i] - 128) / 128; // -1..1
-      const y = midY + v * amp;
+    if (style === "bars") {
+      // Bars/dots style - like voice message waveforms
+      ctx.fillStyle = strokeColor;
+      ctx.lineCap = "round";
 
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+      // Calculate number of bars that fit
+      const barWidth = lineWidth;
+      const totalBarWidth = barWidth + barGap;
+      const numBars = Math.floor(w / totalBarWidth);
 
-      x += slice;
+      // Sample data points evenly across the data array
+      const step = Math.floor(data.length / numBars);
+
+      for (let i = 0; i < numBars; i++) {
+        const dataIndex = Math.min(i * step, data.length - 1);
+        const v = Math.abs(data[dataIndex] - 128) / 128; // 0..1 (absolute value)
+
+        // Minimum bar height for visual consistency
+        const minBarHeight = 2;
+        const barHeight = Math.max(minBarHeight, v * amp * 2);
+
+        const x = i * totalBarWidth + barGap / 2;
+        const y = midY - barHeight / 2;
+
+        // Draw rounded bar
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, barHeight, barWidth / 2);
+        ctx.fill();
+      }
+    } else {
+      // Line style - continuous waveform
+      ctx.lineWidth = lineWidth;
+      ctx.beginPath();
+
+      const slice = w / (data.length - 1);
+      let x = 0;
+
+      for (let i = 0; i < data.length; i++) {
+        const v = (data[i] - 128) / 128; // -1..1
+        const y = midY + v * amp;
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+
+        x += slice;
+      }
+      ctx.stroke();
     }
-    ctx.stroke();
 
     rafIdRef.current = requestAnimationFrame(draw);
-  }, [amplitude, lineWidth, strokeColor, showBaseline]);
+  }, [amplitude, lineWidth, barGap, strokeColor, showBaseline, style]);
 
   // Start recording
   const start = React.useCallback(async () => {

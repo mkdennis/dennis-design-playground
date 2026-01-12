@@ -1,4 +1,4 @@
-import { Waveform } from "@/components/ui/waveform";
+import { Waveform, WaveformStyle } from "@/components/ui/waveform";
 import { ComponentDefinition } from "../types";
 
 export const waveformComponent: ComponentDefinition = {
@@ -7,6 +7,15 @@ export const waveformComponent: ComponentDefinition = {
   description: "Real-time audio waveform visualization using microphone input. Perfect for speech-to-text interfaces.",
   category: "Animation",
   props: {
+    style: {
+      type: "select",
+      label: "Style",
+      defaultValue: "line",
+      options: [
+        { value: "line", label: "Line (continuous)" },
+        { value: "bars", label: "Bars (dotted)" },
+      ],
+    },
     amplitude: {
       type: "number",
       label: "Amplitude",
@@ -36,11 +45,19 @@ export const waveformComponent: ComponentDefinition = {
     },
     lineWidth: {
       type: "number",
-      label: "Line Width",
+      label: "Line/Bar Width",
       defaultValue: 1.5,
       min: 0.5,
-      max: 4,
+      max: 6,
       step: 0.5,
+    },
+    barGap: {
+      type: "number",
+      label: "Bar Gap",
+      defaultValue: 2,
+      min: 1,
+      max: 8,
+      step: 1,
     },
     strokeColor: {
       type: "color",
@@ -63,10 +80,12 @@ export const waveformComponent: ComponentDefinition = {
   },
   render: (props) => (
     <Waveform
+      style={props.style as WaveformStyle}
       amplitude={props.amplitude as number}
       fftSize={Number(props.fftSize) as 256 | 512 | 1024 | 2048}
       smoothing={props.smoothing as number}
       lineWidth={props.lineWidth as number}
+      barGap={props.barGap as number}
       strokeColor={props.strokeColor as string}
       showBaseline={props.showBaseline as boolean}
       height={props.height as number}
@@ -77,6 +96,9 @@ export const waveformComponent: ComponentDefinition = {
 
     lines.push("<Waveform");
 
+    if (props.style !== "line") {
+      lines.push(`  style="${props.style}"`);
+    }
     if (props.amplitude !== 0.18) {
       lines.push(`  amplitude={${props.amplitude}}`);
     }
@@ -88,6 +110,9 @@ export const waveformComponent: ComponentDefinition = {
     }
     if (props.lineWidth !== 1.5) {
       lines.push(`  lineWidth={${props.lineWidth}}`);
+    }
+    if (props.barGap !== 2) {
+      lines.push(`  barGap={${props.barGap}}`);
     }
     if (props.strokeColor !== "#3b82f6") {
       lines.push(`  strokeColor="${props.strokeColor}"`);
