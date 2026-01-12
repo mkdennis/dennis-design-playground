@@ -32,6 +32,7 @@ import { badgeComponent } from "./components/badge-component";
 import { inputComponent } from "./components/input-component";
 import { alertComponent } from "./components/alert-component";
 import { waveformComponent } from "./components/waveform-component";
+import { liveWaveformComponent } from "./components/live-waveform-component";
 
 /**
  * componentRegistry - The complete list of all components
@@ -48,6 +49,7 @@ export const componentRegistry: ComponentRegistry = [
   inputComponent,
   alertComponent,
   waveformComponent,
+  liveWaveformComponent,
 ];
 
 /**
