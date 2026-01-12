@@ -187,6 +187,8 @@ export const liveWaveformComponent: ComponentDefinition = {
   description:
     "Advanced audio waveform with scrolling/static modes, processing state animation, and edge fading effects.",
   category: "Animation",
+  sourcePath: "components/ui/live-waveform.tsx",
+  dependencies: ["clsx", "tailwind-merge"],
   props: {
     mode: {
       type: "select",

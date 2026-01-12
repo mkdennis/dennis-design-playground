@@ -6,6 +6,8 @@ export const waveformComponent: ComponentDefinition = {
   name: "Waveform",
   description: "Real-time audio waveform visualization using microphone input. Perfect for speech-to-text interfaces.",
   category: "Animation",
+  sourcePath: "components/ui/waveform.tsx",
+  dependencies: ["clsx", "tailwind-merge"],
   props: {
     style: {
       type: "select",

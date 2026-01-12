@@ -22,7 +22,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, ExternalLink, Download } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { ComponentDefinition, PropDefinition } from "@/registry/types";
@@ -68,6 +68,7 @@ export function SettingsPanel({
    * This creates the brief "Copied!" feedback
    */
   const [copied, setCopied] = useState(false);
+  const [copiedExport, setCopiedExport] = useState<string | null>(null);
 
   /**
    * Handle prop value change
@@ -123,6 +124,23 @@ export function SettingsPanel({
       console.error("Failed to copy code:", err);
     }
   };
+
+  /**
+   * Copy export command to clipboard
+   */
+  const handleCopyExport = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedExport(label);
+      setTimeout(() => setCopiedExport(null), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  // GitHub repo info - update this to your repo
+  const GITHUB_REPO = "mkdennis/dennis-design-playground";
+  const GITHUB_BRANCH = "main";
 
   /**
    * Render a single prop control
@@ -306,6 +324,9 @@ export function SettingsPanel({
             <TabsTrigger value="code" className="flex-1">
               Code
             </TabsTrigger>
+            <TabsTrigger value="export" className="flex-1">
+              Export
+            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -381,6 +402,152 @@ export function SettingsPanel({
               )}
             </Button>
           </div>
+        </TabsContent>
+
+        {/*
+         * Export Tab Content
+         */}
+        <TabsContent value="export" className="flex-1 mt-0">
+          <ScrollArea className="h-full">
+            <div className="p-4 space-y-4">
+              {component.sourcePath ? (
+                <>
+                  {/* GitHub Link */}
+                  <div className="space-y-2">
+                    <Label>GitHub Source</Label>
+                    <a
+                      href={`https://github.com/${GITHUB_REPO}/blob/${GITHUB_BRANCH}/src/${component.sourcePath}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                        "flex items-center gap-2 p-3 rounded-lg",
+                        "bg-muted/50 border hover:bg-muted",
+                        "text-sm font-mono transition-colors"
+                      )}
+                    >
+                      <ExternalLink className="h-4 w-4 shrink-0" />
+                      <span className="truncate">{component.sourcePath}</span>
+                    </a>
+                  </div>
+
+                  {/* Raw file URL */}
+                  <div className="space-y-2">
+                    <Label>Download Command</Label>
+                    <div className="relative">
+                      <pre
+                        className={cn(
+                          "p-3 pr-12 rounded-lg overflow-x-auto",
+                          "bg-muted/50 border",
+                          "text-xs font-mono"
+                        )}
+                      >
+                        {`curl -o ${component.sourcePath.split("/").pop()} \\
+  https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/src/${component.sourcePath}`}
+                      </pre>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-2 right-2 h-7 w-7 p-0"
+                        onClick={() =>
+                          handleCopyExport(
+                            `curl -o ${component.sourcePath!.split("/").pop()} https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/src/${component.sourcePath}`,
+                            "curl"
+                          )
+                        }
+                      >
+                        {copiedExport === "curl" ? (
+                          <Check className="h-3 w-3" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Dependencies */}
+                  {component.dependencies && component.dependencies.length > 0 && (
+                    <div className="space-y-2">
+                      <Label>Dependencies</Label>
+                      <div className="relative">
+                        <pre
+                          className={cn(
+                            "p-3 pr-12 rounded-lg",
+                            "bg-muted/50 border",
+                            "text-xs font-mono"
+                          )}
+                        >
+                          npm install {component.dependencies.join(" ")}
+                        </pre>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="absolute top-2 right-2 h-7 w-7 p-0"
+                          onClick={() =>
+                            handleCopyExport(
+                              `npm install ${component.dependencies!.join(" ")}`,
+                              "deps"
+                            )
+                          }
+                        >
+                          {copiedExport === "deps" ? (
+                            <Check className="h-3 w-3" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Utils helper */}
+                  <div className="space-y-2">
+                    <Label>Required Utility</Label>
+                    <p className="text-xs text-muted-foreground">
+                      This component uses the <code className="bg-muted px-1 rounded">cn()</code> utility.
+                      Add this to <code className="bg-muted px-1 rounded">lib/utils.ts</code>:
+                    </p>
+                    <div className="relative">
+                      <pre
+                        className={cn(
+                          "p-3 pr-12 rounded-lg overflow-x-auto",
+                          "bg-muted/50 border",
+                          "text-xs font-mono"
+                        )}
+                      >
+{`import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}`}
+                      </pre>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute top-2 right-2 h-7 w-7 p-0"
+                        onClick={() =>
+                          handleCopyExport(
+                            `import { clsx, type ClassValue } from "clsx";\nimport { twMerge } from "tailwind-merge";\n\nexport function cn(...inputs: ClassValue[]) {\n  return twMerge(clsx(inputs));\n}`,
+                            "utils"
+                          )
+                        }
+                      >
+                        {copiedExport === "utils" ? (
+                          <Check className="h-3 w-3" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Export information not available for this component.
+                </p>
+              )}
+            </div>
+          </ScrollArea>
         </TabsContent>
       </Tabs>
     </div>
