@@ -410,6 +410,44 @@ export function SettingsPanel({
         <TabsContent value="export" className="flex-1 mt-0">
           <ScrollArea className="h-full">
             <div className="p-4 space-y-4">
+              {/* Current Configuration - shows the tweaked props */}
+              <div className="space-y-2">
+                <Label>Current Configuration</Label>
+                <p className="text-xs text-muted-foreground">
+                  Your customized props for this component:
+                </p>
+                <div className="relative">
+                  <pre
+                    className={cn(
+                      "p-3 pr-12 rounded-lg overflow-x-auto",
+                      "bg-muted/50 border",
+                      "text-xs font-mono"
+                    )}
+                  >
+                    {JSON.stringify(currentProps, null, 2)}
+                  </pre>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2 h-7 w-7 p-0"
+                    onClick={() =>
+                      handleCopyExport(
+                        JSON.stringify(currentProps, null, 2),
+                        "config"
+                      )
+                    }
+                  >
+                    {copiedExport === "config" ? (
+                      <Check className="h-3 w-3" />
+                    ) : (
+                      <Copy className="h-3 w-3" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <Separator />
+
               {component.sourcePath ? (
                 <>
                   {/* GitHub Link */}
