@@ -139,8 +139,9 @@ export function SettingsPanel({
   };
 
   // GitHub repo info - update this to your repo
+  // Note: Update GITHUB_BRANCH to match the branch where files are pushed
   const GITHUB_REPO = "mkdennis/dennis-design-playground";
-  const GITHUB_BRANCH = "main";
+  const GITHUB_BRANCH = "claude/save-component-tweaks-Bp7nh";
 
   /**
    * Render a single prop control
