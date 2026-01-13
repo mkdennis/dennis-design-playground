@@ -124,6 +124,19 @@ export interface ComponentDefinition {
   category: string;
 
   /**
+   * Path to the component source file (relative to src/)
+   * Used for generating GitHub links and export commands
+   * @example "components/ui/button.tsx"
+   */
+  sourcePath?: string;
+
+  /**
+   * External dependencies required by this component
+   * @example ["clsx", "tailwind-merge"]
+   */
+  dependencies?: string[];
+
+  /**
    * The configurable props for this component
    *
    * This is a Record (object/dictionary) where:
