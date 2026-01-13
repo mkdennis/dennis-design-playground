@@ -32,6 +32,37 @@ import { ComponentList, ComponentViewer, SettingsPanel } from "@/components/play
 import { Button } from "@/components/ui/button";
 
 /**
+ * LocalStorage key prefix for saving component tweaks
+ * Each component's props are saved under: playground-props-{componentId}
+ */
+const STORAGE_KEY_PREFIX = "playground-props-";
+
+/**
+ * Helper to get saved props from localStorage
+ */
+function getSavedProps(componentId: string): Record<string, unknown> | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const saved = localStorage.getItem(`${STORAGE_KEY_PREFIX}${componentId}`);
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Helper to save props to localStorage
+ */
+function saveProps(componentId: string, props: Record<string, unknown>): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(`${STORAGE_KEY_PREFIX}${componentId}`, JSON.stringify(props));
+  } catch (err) {
+    console.error("Failed to save props:", err);
+  }
+}
+
+/**
  * Home Page Component
  *
  * This is the default export, which Next.js uses as the page component.
@@ -130,13 +161,23 @@ export default function Home() {
        * reduce() builds a new object by iterating through the entries
        * acc is the "accumulator" - the object we're building
        */
-      const initialProps = Object.entries(component.props).reduce(
+      const defaultProps = Object.entries(component.props).reduce(
         (acc, [propName, propDef]) => {
           acc[propName] = propDef.defaultValue;
           return acc;
         },
         {} as Record<string, unknown>
       );
+
+      /*
+       * Check for saved props in localStorage
+       * Merge saved props with defaults to handle any new props added to the component
+       */
+      const savedProps = getSavedProps(id);
+      const initialProps = savedProps
+        ? { ...defaultProps, ...savedProps }
+        : defaultProps;
+
       setCurrentProps(initialProps);
     }
 
@@ -150,12 +191,20 @@ export default function Home() {
   /**
    * Handle prop changes from the settings panel
    *
-   * Simply updates the currentProps state.
+   * Updates the currentProps state and saves to localStorage.
    * React's reactivity ensures the preview updates automatically.
    */
   const handlePropsChange = useCallback((newProps: Record<string, unknown>) => {
     setCurrentProps(newProps);
-  }, []);
+
+    /*
+     * Save props to localStorage whenever they change
+     * This ensures tweaks persist across page refreshes
+     */
+    if (selectedComponentId) {
+      saveProps(selectedComponentId, newProps);
+    }
+  }, [selectedComponentId]);
 
   /*
    * =========================================
