@@ -18,20 +18,23 @@ export function titleCase(str: string): string {
 
 /**
  * Truncates a string to a specified length and adds ellipsis.
- * Bug: Doesn't handle edge cases (null, short strings)
  */
 export function truncate(str: string, maxLength: number): string {
+  if (maxLength <= 0 || str.length === 0) return '';
+  if (str.length <= maxLength) return str;
   return str.slice(0, maxLength - 3) + '...';
 }
 
 /**
  * Converts a string to slug format (URL-friendly).
- * Bug: Doesn't handle special characters or multiple hyphens
  */
 export function slugify(str: string): string {
   return str
     .toLowerCase()
-    .replace(/\s+/g, '-');
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
 }
 
 /**
@@ -44,18 +47,17 @@ export function reverseWords(str: string): string {
 
 /**
  * Checks if a string is a valid email format.
- * Bug: Overly simple regex, misses many cases
  */
 export function isValidEmail(email: string): boolean {
-  return /\S+@\S+/.test(email);
+  if (/\.\./.test(email)) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 /**
  * Counts the occurrences of a substring in a string.
- * Bug: Returns wrong value for empty substring (should return 0, returns str.length+1)
  */
 export function countOccurrences(str: string, substring: string): number {
-  if (substring.length === 0) return str.length + 1; // Bug: should return 0
+  if (substring.length === 0) return 0;
   let count = 0;
   let pos = 0;
   while ((pos = str.indexOf(substring, pos)) !== -1) {
@@ -67,9 +69,15 @@ export function countOccurrences(str: string, substring: string): number {
 
 /**
  * Pads a string to a specified length with a given character.
- * Bug: Doesn't validate inputs properly
  */
 export function padString(str: string, length: number, char: string = ' ', position: 'left' | 'right' = 'right'): string {
-  const padding = char.repeat(length - str.length);
+  if (str.length >= length) return str;
+  const padLength = length - str.length;
+  let padding: string;
+  if (char.length > 1) {
+    padding = ' ' + char.repeat(Math.ceil(padLength / char.length));
+  } else {
+    padding = char.repeat(padLength);
+  }
   return position === 'left' ? padding + str : str + padding;
 }
